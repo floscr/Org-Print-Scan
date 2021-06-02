@@ -8,25 +8,24 @@ import tempfile
 import os
 
 const SCAN_FILE_NAME = "out.pnm"
-const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed ${SCAN_FILE_NAME} ./ > /dev/null 2>&1"
 const SCAN_CMD = &"""scanimage \
     --mode Color \
     --resolution 600 \
     --format pnm \
-    --output ${SCAN_FILE_NAME} \
-    > /dev/null 2>&1"""
+    --output ${SCAN_FILE_NAME}"""
+const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed ${SCAN_FILE_NAME} ./"
 
 proc main*(opts: CLIArgs): any =
   let workingDir = mkdtemp()
 
   # When no file name is passed execute scan & processing command
-  let input = opts.input
+  let filename = opts.input
     .fold(
-      () => sh(SCAN_CMD, { poStdErrToStdOut: true, workingDir })
-        .flatMap(sh(PROCESS_SCAN_CMD))
+      () => sh(SCAN_CMD, workingDir)
         .map(x => "out.tif"),
-      x => x.right,
+      x => x.rightS,
     )
     .map(x => joinPath(workingDir, x))
 
-  echo $input
+  echo $filename
+  ""
