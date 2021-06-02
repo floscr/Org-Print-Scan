@@ -42,7 +42,10 @@
           '';
         };
 
-        devShell = import ./shell.nix { inherit pkgs; };
+        devShell = import ./shell.nix {
+          inherit pkgs;
+          inherit nimpkgs;
+        };
 
         defaultPackage = packages.org_print_scan;
 
