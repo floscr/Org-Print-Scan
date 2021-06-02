@@ -14,7 +14,8 @@ When a file with a .pdf extension is passed, the file will be appended.""")
 
   run:
     let options = CLIArgs(
-      input: opts.input.Some.notEmpty
+      input: opts.input.Some.notEmpty,
+      output: opts.output.Some.notEmpty,
     )
     discard main(options)
     quit(1)
