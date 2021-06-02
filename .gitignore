@@ -1,3 +1,5 @@
 result
 /.nimble/
 /.direnv/
+/src
+!/src/**/*.nim
