@@ -22,10 +22,13 @@ proc main*(opts: CLIArgs): any =
   let filename = opts.input
     .fold(
       () => sh(SCAN_CMD, workingDir)
+        .flatMap((x: string) => sh(PROCESS_SCAN_CMD, workingDir))
         .map(x => "out.tif"),
       x => x.rightS,
     )
     .map(x => joinPath(workingDir, x))
+    # OCR the input file
+    .flatMap((x: string) => sh(&"ocrmypdf ${x} out.pdf", workingDir))
 
   echo $filename
   ""
