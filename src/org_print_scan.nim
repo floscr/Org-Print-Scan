@@ -1,20 +1,21 @@
 import argparse
-import strformat
+import fp/option
 import lib/main
+import lib/types
+import strformat
 import sugar
 
 const AppName = "org_print_scan"
 const USE_STDIN = "USE_STDIN"
 
 var p = newParser(AppName):
-  help "Help text here..."
-
-  flag "--version", help = "Print the version of " & AppName
-  flag "--revision", help = "Print the Git SHA of " & AppName
-  flag "--info", help = "Print version and revision"
+  option("-i", "--input", help = "Input File \nDefaults to scanning when no input is passed.")
 
   run:
-    echo main()
+    let options = CLIArgs(
+      input: opts.input.Some.notEmpty
+    )
+    discard main(options)
     quit(1)
 
 p.run

@@ -34,6 +34,7 @@
             -p:${nimpkgs.nimboost}/src \
             -p:${nimpkgs.classy}/src \
             -p:${nimpkgs.nimfp}/src \
+            -p:${nimpkgs.tempfile}/src \
             --out:$TMPDIR/org_print_scan \
             ./src/org_print_scan.nim
           '';
