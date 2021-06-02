@@ -17,6 +17,8 @@
           nativeBuildInputs = with pkgs; [
             nimpkgs.nim
             pkgconfig
+            scantailor
+            ocrmypdf
           ];
 
           # depsBuildBuild = [ pkgs.nim ];
