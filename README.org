@@ -1,0 +1,23 @@
+#+TITLE: Readme
+
+Small tool to quickly take input images (or scan an image) and ocr it using [[https://github.com/jbarlow83/OCRmyPDF][ocrmypdf]] converting it to a greppable pdf.
+
+* Instructions
+
+** Scan an image to an ocred pdf:
+
+When not passing any ~--input~ flag, a scan operation will be the input source.
+
+#+begin_src sh
+org_print_scan --output myimage.pdf
+#+end_src
+
+** Merge input to other pdf
+
+When passing an existing pdf as an ~--output~, the ~--input~ will be automatically appended to the output.
+
+#+begin_src sh
+org_print_scan --output existing.pdf
+#+end_src
+
+Your existing data will back up to a temporary backup dir, define in ~src/lib/main.nim~.
