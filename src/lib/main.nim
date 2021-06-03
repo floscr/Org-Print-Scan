@@ -13,8 +13,8 @@ const SCAN_CMD = &"""scanimage \
     --mode Color \
     --resolution 600 \
     --format pnm \
-    --output ${SCAN_FILE_NAME}"""
-const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed ${SCAN_FILE_NAME} ./"
+    --output {SCAN_FILE_NAME}"""
+const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed {SCAN_FILE_NAME} ./"
 
 proc preparePassedFile(path: string, workingDir: string): Either[string, string] =
     # Convert to tif format and remove the alpha channel
