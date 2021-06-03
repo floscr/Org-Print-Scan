@@ -28,15 +28,18 @@
 
           buildPhase = with pkgs; ''
             HOME=$TMPDIR
+            # Pass paths of needed buildInputs
+            # and nim packages fetched from nix
             nim compile \
-            -d:release \
-            -p:${nimpkgs.argparse}/src \
-            -p:${nimpkgs.nimboost}/src \
-            -p:${nimpkgs.classy}/src \
-            -p:${nimpkgs.nimfp}/src \
-            -p:${nimpkgs.tempfile}/src \
-            --out:$TMPDIR/org_print_scan \
-            ./src/org_print_scan.nim
+                -d:release \
+                -p:${ocrmypdf}/bin \
+                -p:${nimpkgs.argparse}/src \
+                -p:${nimpkgs.nimboost}/src \
+                -p:${nimpkgs.classy}/src \
+                -p:${nimpkgs.nimfp}/src \
+                -p:${nimpkgs.tempfile}/src \
+                --out:$TMPDIR/org_print_scan \
+                ./src/org_print_scan.nim
           '';
           installPhase = ''
             install -Dt \
