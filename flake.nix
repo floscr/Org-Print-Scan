@@ -20,7 +20,7 @@
           src = ./.;
 
           nativeBuildInputs = with pkgs; [
-            nimpkgs.nim
+            nim
             pkgconfig
           ];
 
