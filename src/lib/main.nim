@@ -52,14 +52,12 @@ proc getOutput(path: Option[string], workingDir: string, isScan: bool): Option[s
         path
 
 proc saveFinal(input: string, output: string): Either[string, string] =
-
-
     if fileExists(output):
         let backupDir = mkdtemp(dir = BACKUPDIR)
         let backupFile = joinPath(backupDir, extractFilename(output))
         moveFile(output, backupFile)
 
-        sh("qpdf --empty --pages {backupFile} {input} -- {output}")
+        sh(&"qpdf --empty --pages {backupFile} {input} -- {output}")
             .map((x: string) => output)
     else:
         let (_, _, ext) = splitFile(output)
