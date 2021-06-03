@@ -20,9 +20,7 @@ proc preparePassedFile(path: string, workingDir: string): Either[string, string]
     let outFile = changeFileExt(inPath, "tif")
         .extractFilename
     let outPath = joinPath(workingDir, outFile)
-    echo inPath
-    echo outPath
-    sh(&"convert {inPath} {outPath}", workingDir)
+    sh(&"convert {inPath} -alpha off {outPath}", workingDir)
         .map((x: string) => outPath)
 
 proc main*(opts: CLIArgs): any =
