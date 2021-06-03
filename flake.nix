@@ -9,6 +9,11 @@
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};
           nimpkgs = nimble.packages.${system};
+          buildInputs = with pkgs; [
+            imagemagick
+            ocrmypdf
+            scantailor
+          ];
       in rec {
         packages.org_print_scan = pkgs.stdenv.mkDerivation {
           name = "org_print_scan";
@@ -19,12 +24,7 @@
             pkgconfig
           ];
 
-          # depsBuildBuild = [ pkgs.nim ];
-
-          buildInputs = with pkgs; [
-            scantailor
-            ocrmypdf
-          ];
+          buildInputs = buildInputs;
 
           buildPhase = with pkgs; ''
             HOME=$TMPDIR
@@ -48,6 +48,7 @@
         devShell = import ./shell.nix {
           inherit pkgs;
           inherit nimpkgs;
+          inherit buildInputs;
         };
 
         defaultPackage = packages.org_print_scan;

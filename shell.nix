@@ -1,12 +1,10 @@
-{ pkgs, nimpkgs }:
+{ pkgs, nimpkgs, buildInputs }:
 
 pkgs.mkShell {
   shellHook = ''
-    export SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
     export NIMBLE_DIR="$PWD/.nimble"
   '';
-  buildInputs = with pkgs; [
-    nim
+  buildInputs = with pkgs; buildInputs ++ [
     nimlsp
   ];
 }
