@@ -60,8 +60,6 @@ proc saveFinal(input: string, output: string): Either[string, string] =
         sh(&"qpdf --empty --pages {backupFile} {input} -- {output}")
             .map((x: string) => output)
     else:
-        let (_, _, ext) = splitFile(output)
-
         moveFile(input, output)
         output.right("")
 
