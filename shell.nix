@@ -5,6 +5,7 @@ pkgs.mkShell {
     export NIMBLE_DIR="$PWD/.nimble"
   '';
   buildInputs = with pkgs; buildInputs ++ [
+    nim
     nimlsp
   ];
 }
