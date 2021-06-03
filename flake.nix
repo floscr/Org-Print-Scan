@@ -32,6 +32,9 @@
             # and nim packages fetched from nix
             nim compile \
                 -d:release \
+                --verbosity:0 \
+                --hint[Processing]:off \
+                --excessiveStackTrace:on \
                 -p:${ocrmypdf}/bin \
                 -p:${nimpkgs.cligen}/src \
                 -p:${nimpkgs.nimboost}/src \
