@@ -13,6 +13,7 @@
             imagemagick
             ocrmypdf
             scantailor
+            qpdf
           ];
       in rec {
         packages.org_print_scan = pkgs.stdenv.mkDerivation {
