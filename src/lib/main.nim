@@ -17,7 +17,9 @@ const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed ${SCAN_FILE_NAME} .
 
 proc preparePassedFile(path: string, workingDir: string): Either[string, string] =
     let inPath = absolutePath(path)
-    let outPath = changeFileExt(inPath, "tif")
+    let outFile = changeFileExt(inPath, "tif")
+        .extractFilename
+    let outPath = joinPath(workingDir, outFile)
     echo inPath
     echo outPath
     sh(&"convert {inPath} {outPath}", workingDir)
