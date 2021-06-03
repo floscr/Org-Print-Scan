@@ -33,7 +33,7 @@
             nim compile \
                 -d:release \
                 -p:${ocrmypdf}/bin \
-                -p:${nimpkgs.argparse}/src \
+                -p:${nimpkgs.cligen}/src \
                 -p:${nimpkgs.nimboost}/src \
                 -p:${nimpkgs.classy}/src \
                 -p:${nimpkgs.nimfp}/src \

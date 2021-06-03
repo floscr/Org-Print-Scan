@@ -26,23 +26,42 @@ proc preparePassedFile(path: string, workingDir: string): Either[string, string]
     sh(&"convert {inPath} -alpha off {outPath}", workingDir)
         .map((x: string) => outPath)
 
-proc main*(opts: CLIArgs): any =
-    let workingDir = mkdtemp()
+proc main*(input = "", output = ""): any =
+    # let input = input.Some.notEmpty
+    # let output = output.Some.notEmpty
 
-    # When no file name is passed execute scan & processing command
-    let filename = opts.input
-        .fold(
-          () => sh(SCAN_CMD, workingDir)
-            .flatMap((x: string) => sh(PROCESS_SCAN_CMD, workingDir))
-            .map(x => "out.tif")
-            .map(x => joinPath(workingDir, x)),
-          x => x
-            .rightS
-            .flatMap((path: string) => preparePassedFile(path, workingDir))
-        )
-        .log
-        # OCR the input file
-        .flatMap((x: string) => sh(&"ocrmypdf {x} out.pdf --image-dpi 72"))
+    # echo typeof input
+    discard input.Some.notEmpty.map((x: string) => "foo")
 
-    echo $filename
+    # let workingDir = mkdtemp()
+
+    # let ocrPdfPath = joinPath(workingDir, "out.pdf")
+
+    # # let output = opts.output.asEither("No file supplied")
+
+    # # let outPath = output
+    # #     .map((x: string) => changeFileExt(x, "pdf"))
+    # #     .orElse(() => opts.input
+    # #             .map((x: string) => changeFileExt(x, "pdf"))
+    # #             .filter((x: string) => fileExists(x))
+    # #             .asEither("File exists.")
+    # #     )
+
+    # # if (outPath.isLeft): raise newException(Exception, outPath.getLeft)
+
+    # # When no file name is passed execute scan & processing command
+    # let filename = input
+    #     .fold(
+    #       () => sh(SCAN_CMD, workingDir)
+    #         .flatMap((x: string) => sh(PROCESS_SCAN_CMD, workingDir))
+    #         .map(x => "out.tif")
+    #         .map(x => joinPath(workingDir, x)),
+    #       x => x
+    #         .rightS
+    #         .flatMap((path: string) => preparePassedFile(path, workingDir))
+    #     )
+    #     # OCR the input file
+    #     .flatMap((x: string) => sh(&"ocrmypdf {x} {ocrPdfPath} --image-dpi 72"))
+
+    # echo $filename
     ""

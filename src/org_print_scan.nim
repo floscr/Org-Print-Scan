@@ -1,23 +1,17 @@
-import argparse
-import fp/option
+import cligen
 import lib/main
-import lib/types
-import strformat
+
+{.experimental.}
 
 const AppName = "org_print_scan"
 
-var p = newParser(AppName):
-  option("-i", "--input", help = """Input File
-Defaults to scanning when no input is passed.""")
-  option("-o", "--output", help = """Output File
-When a file with a .pdf extension is passed, the file will be appended.""")
+proc cli(input="", output=""): int =
+  discard main(input = input, output = output)
+  1
 
-  run:
-    let options = CLIArgs(
-      input: opts.input.Some.notEmpty,
-      output: opts.output.Some.notEmpty,
-    )
-    discard main(options)
-    quit(1)
-
-p.run
+dispatch(cli, help = {
+  "input": """Input file
+When no file is passed it defaults to scanning via scanimage""",
+  "output": """Output file
+When passing an existing pdf, the pages will be appended.""",
+})

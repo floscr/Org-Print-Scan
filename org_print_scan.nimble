@@ -13,7 +13,7 @@ binDir        = "./dst"
 
 requires "nim >= 1.4.4"
 requires "nimfp >= 0.4.5"
-requires "argparse >= 2.0.0"
+requires "cligen >= 1.5.4"
 requires "tempfile >= 0.1.7"
 
 import distros
