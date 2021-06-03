@@ -15,20 +15,31 @@ const SCAN_CMD = &"""scanimage \
     --output ${SCAN_FILE_NAME}"""
 const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed ${SCAN_FILE_NAME} ./"
 
+proc preparePassedFile(path: string, workingDir: string): Either[string, string] =
+    let inPath = absolutePath(path)
+    let outPath = changeFileExt(inPath, "tif")
+    echo inPath
+    echo outPath
+    sh(&"convert {inPath} {outPath}", workingDir)
+        .map((x: string) => outPath)
+
 proc main*(opts: CLIArgs): any =
-  let workingDir = mkdtemp()
+    let workingDir = mkdtemp()
 
-  # When no file name is passed execute scan & processing command
-  let filename = opts.input
-    .fold(
-      () => sh(SCAN_CMD, workingDir)
-        .flatMap((x: string) => sh(PROCESS_SCAN_CMD, workingDir))
-        .map(x => "out.tif"),
-      x => x.rightS,
-    )
-    .map(x => joinPath(workingDir, x))
-    # OCR the input file
-    .flatMap((x: string) => sh(&"ocrmypdf ${x} out.pdf", workingDir))
+    # When no file name is passed execute scan & processing command
+    let filename = opts.input
+        .fold(
+          () => sh(SCAN_CMD, workingDir)
+            .flatMap((x: string) => sh(PROCESS_SCAN_CMD, workingDir))
+            .map(x => "out.tif")
+            .map(x => joinPath(workingDir, x)),
+          x => x
+            .rightS
+            .flatMap((path: string) => preparePassedFile(path, workingDir))
+        )
+        .log
+        # OCR the input file
+        .flatMap((x: string) => sh(&"ocrmypdf {x} out.pdf --image-dpi 72"))
 
-  echo $filename
-  ""
+    echo $filename
+    ""
