@@ -100,6 +100,7 @@ proc main*(input = "", output = ""): any =
     if filename.isRight:
         echo filename.getOrElse("")
         echo output.getOrElse("")
-        discard saveFinal(input = filename.getOrElse(""), output = output.getOrElse(""))
+        discard saveFinal(input = filename.getOrElse(""),
+                output = output.getOrElse(""))
         echo "Finish saving file"
     ""
