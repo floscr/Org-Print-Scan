@@ -16,6 +16,8 @@ const SCAN_CMD = &"""scanimage \
 const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed ${SCAN_FILE_NAME} ./"
 
 proc preparePassedFile(path: string, workingDir: string): Either[string, string] =
+    # Convert to tif format and remove the alpha channel
+    # ocrmypdf doesn't work with alpha channels
     let inPath = absolutePath(path)
     let outFile = changeFileExt(inPath, "tif")
         .extractFilename
