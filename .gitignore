@@ -1,5 +1,8 @@
 result
 /.nimble/
 /.direnv/
-/src
-!/src/**/*.nim
+
+# Ignore binaries directly compiled from emacs during testing
+src/**/*
+!src/**/
+!src/**/*.*
