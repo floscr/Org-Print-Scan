@@ -65,28 +65,28 @@ proc saveFinal(input: string, output: string): Either[string, string] =
 
 proc main*(input = "", output = ""): any =
     let isScan = input == ""
-    let workingDir = mkdtemp()
+    let tmpDir = mkdtemp()
 
     let output = getOutput(
       path = output.Some.notEmpty,
-      workingDir = workingDir,
+      workingDir = tmpDir,
       isScan = isScan
     )
 
-    let ocrPdfPath = joinPath(workingDir, "out.pdf")
+    let ocrPdfPath = joinPath(tmpDir, "out.pdf")
 
     # When no file name is passed execute scan & processing command
     let filename = input
         .Some
         .notEmpty
         .fold(
-          () => sh(SCAN_CMD, workingDir)
-            .flatMap((x: string) => sh(PROCESS_SCAN_CMD, workingDir))
+          () => sh(SCAN_CMD, tmpDir)
+            .flatMap((x: string) => sh(PROCESS_SCAN_CMD, tmpDir))
             .map(x => "out.tif")
-            .map(x => joinPath(workingDir, x)),
+            .map(x => joinPath(tmpDir, x)),
           x => x
             .rightS
-            .flatMap((path: string) => preparePassedFile(path, workingDir))
+            .flatMap((path: string) => preparePassedFile(path, tmpDir))
         )
         # OCR the input file
         .flatMap((x: string) => sh(&"ocrmypdf {x} {ocrPdfPath} --image-dpi 72")
