@@ -27,11 +27,11 @@ proc preparePassedFile(path: string, workingDir: string): Either[string, string]
     sh(&"convert {inPath} -alpha off {outPath}", workingDir)
         .map((x: string) => outPath)
 
-proc getOutput(path: Option[string], workingDir: string, isScan: bool): Option[string] =
+proc getOutput(path: Option[string], workingDir: string): Option[string] =
     let path = path
         .map((x: string) => absolutePath(x))
 
-    if path.isEmpty and isScan:
+    if path.isEmpty:
         let (_, name) = mkstemp()
         let filename = name.Some
             .map((x: string) => extractFilename(x))
@@ -64,13 +64,11 @@ proc saveFinal(input: string, output: string): Either[string, string] =
         output.right("")
 
 proc main*(input = "", output = ""): any =
-    let isScan = input == ""
     let tmpDir = mkdtemp()
 
     let output = getOutput(
       path = output.Some.notEmpty,
       workingDir = tmpDir,
-      isScan = isScan
     )
 
     let ocrPdfPath = joinPath(tmpDir, "out.pdf")
