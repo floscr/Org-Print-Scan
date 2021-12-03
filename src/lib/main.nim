@@ -6,6 +6,7 @@ import std/sugar
 import std/osproc
 import std/strutils
 import std/times
+import std/options
 import fusion/matching
 import fp/list
 import fp/either
@@ -14,10 +15,16 @@ import ./env
 import ./type_document
 import ./utils/fp
 import ./org
+import cascade
 
 {.experimental: "caseStmtMacros".}
 
-proc copyFile(path: string, env: Env): auto =
+proc copyFile(
+  path: string,
+  env: Env,
+  title: Maybe[string],
+  tags: Maybe[seq[string]],
+): auto =
   let srcDocument = newDocument(path)
 
   let dstFilename = srcDocument.getDstFileName()
@@ -28,7 +35,9 @@ proc copyFile(path: string, env: Env): auto =
   # TODO: Will throw if copying fails
   copyFile(path, dstPath)
 
-  let dstDocument = newDocument(dstPath)
+  let dstDocument = cascade newDocument(dstPath):
+    title = title
+    tags = tags
 
   var orgFile = open(env.orgFile, fmAppend)
   orgFile.writeLine(dstDocument.toOrg(env))
@@ -52,7 +61,17 @@ proc setup(env: Env): auto =
 
   env
 
-proc main*(filePaths: seq[string]): auto =
+proc main*(
+  filePaths: seq[string],
+  headline: Maybe[string],
+  tags: Maybe[string],
+): auto =
+
+  let tags = tags
+  .map(x => x.split(","))
+
+  let title = headline
+
   let filePaths = filePaths
   .map(expandTilde)
   .filter(fileExists)
@@ -63,4 +82,9 @@ proc main*(filePaths: seq[string]): auto =
 
   filePaths
   .asList()
-  .map(path => copyFile(path=path, env=env.get()))
+  .map(path => copyFile(
+    path = path,
+    env = env.get(),
+    tags = tags,
+    title = title,
+  ))

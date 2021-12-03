@@ -1,12 +1,10 @@
 import std/os
 import std/times
 import std/strformat
-import std/options
 import std/sugar
 import fusion/matching
 import fp/maybe
 import ./env
-import ./utils/fp
 import ./org
 
 {.experimental: "caseStmtMacros".}
@@ -16,7 +14,8 @@ const DOCUMENT_TIME_FORMAT* = "yyyyMMdd"
 type Document* = ref object
   path*: string
   fileInfo*: FileInfo
-  title*: Option[string]
+  title*: Maybe[string]
+  tags*: Maybe[seq[string]]
 
 proc newDocument*(path: string): Document =
   Document(
@@ -37,12 +36,14 @@ proc getDstFileName*(x: Document): string =
 
   &"""{date}-{filename}{ext}"""
 
-proc toOrg*(x: Document, env: Env): string =
-  let (_, base, ext) = x.path.splitFile()
-  let relativeFileName = relativePath(x.path, env.baseDir)
+proc toOrg*(
+  doc: Document,
+  env: Env,
+): string =
+  let (_, base, ext) = doc.path.splitFile()
+  let relativeFileName = relativePath(doc.path, env.baseDir)
 
-  let titleLink = x.title
-  .convertMaybe()
+  let titleLink = doc.title
   .fold(
     () => &"[[file:./{relativeFileName}][{base}{ext}]]",
     title => &"[[file:./{relativeFileName}][{title}]]",
@@ -51,6 +52,7 @@ proc toOrg*(x: Document, env: Env): string =
   org.makeHeadline(
     title = titleLink,
     level = 2,
+    tags = doc.tags.getOrElse(newSeq[string]()),
     properties = @[
       ("CREATED", org.makeTimestamp(env.executionDate))
     ],
