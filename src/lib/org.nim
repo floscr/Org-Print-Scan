@@ -95,12 +95,18 @@ proc initFile*(
   let headline = rootHeadline
   .map(x => makeHeadline(x))
 
-  @[
+  let contents = @[
     header,
     headline,
   ] --> filter(it.isDefined())
   .map(it.get())
   .reduce(it.accu & "\n\n" & it.elem)
+
+  contents
+  .just()
+  .notEmpty()
+  .map(x => x & "\n")
+  .getOrElse("")
 
 when isMainModule:
   import unittest
@@ -127,8 +133,11 @@ when isMainModule:
 
   test "Empty File":
     check: initFile() == ""
-    check: initFile(fileTitleHeader = "Foo".just()) == "#+TITLE: Foo"
-    check: initFile(rootHeadline = "Foo".just()) == "* Foo"
+    check: initFile(fileTitleHeader = "Foo".just()) == """#+TITLE: Foo
+"""
+    check: initFile(rootHeadline = "Foo".just()) == """* Foo
+"""
     check: initFile(fileTitleHeader = "Foo".just(), rootHeadline = "Foo".just()) == """#+TITLE: Foo
 
-* Foo"""
+* Foo
+"""
