@@ -1,109 +1,68 @@
-import utils
-import fp/option
+import std/os
+import std/osproc
+import std/collections/sequtils
+import std/strformat
+import std/sugar
+import std/osproc
+import std/strutils
+import std/times
+import fusion/matching
+import fp/list
 import fp/either
-import sugar
-import strformat
-import strutils
-import tempfile
-import os
+import fp/maybe
+import ./env
+import ./type_document
+import ./utils/fp
+import ./org
 
-const BACKUPDIR = "/tmp/org-print-scan-pdf-backup-dir"
+{.experimental: "caseStmtMacros".}
 
-const SCAN_FILE_NAME = "out.pnm"
-const SCAN_CMD = &"""scanimage \
-    --mode Color \
-    --resolution 600 \
-    --format pnm \
-    --output {SCAN_FILE_NAME}"""
-const PROCESS_SCAN_CMD = &"scantailor-cli --color-mode=mixed {SCAN_FILE_NAME} ./"
+proc copyFile(path: string, env: Env): auto =
+  let (srcDir, srcBase, srcExt) = path.splitFile()
 
-proc confirm(question = "Confirm?", confirm = "[y/N]"): bool =
-  while true:
-    stdout.write(&"{question} {confirm}")
+  let srcDocument = newDocument(path)
 
-  stdin.readLine
-  .some
-  .notEmpty
-  .map((x: string) => x.toLower())
-  .filter(x => x == "y")
-  .isDefined
+  let dstFilename = srcDocument.getDstFileName()
+  let dstPath = env.scansDir.joinPath(dstFilename)
 
-proc confirmOrAbort(question = "Confirm?", confirm = "[y/N]", err = "The previous prompt needs to be confirmed!"): void =
-  if not confirm(question, confirm):
-    quit(err, QuitFailure)
+  echo ("Copying File:", path, dstPath)
 
-proc fileOverwritePrompt(path: string): void =
-  confirmOrAbort(question = "Overwrite path: {path}?")
+  # TODO: Will throw if copying fails
+  copyFile(path, dstPath)
 
-proc preparePassedFile(path: string, workingDir: string): Either[string, string] =
-    # Convert to tif format and remove the alpha channel
-    # ocrmypdf doesn't work with alpha channels
-    let inPath = absolutePath(path)
-    let outFile = changeFileExt(path, "tif")
-    .extractFilename
-    let outPath = joinPath(workingDir, outFile)
+  let dstDocument = newDocument(dstPath)
 
-    sh(&"convert {inPath} -alpha off {outPath}", workingDir)
-    .map((x: string) => outPath)
+  var orgFile = open(env.orgFile, fmAppend)
+  orgFile.writeLine(dstDocument.toOrg(env))
 
-proc scanOutputPath(workingDir: string): string =
-    let (_, name) = mkstemp()
+  dstDocument
 
-    name
-    .Some
-    .map((x: string) => extractFilename(x))
-    .map((x: string) => changeFileExt(x, "pdf"))
-    .map((x: string) => joinPath(workingDir, x))
-    .get
+proc setup(env: Env): auto =
+  @[
+    env.baseDir,
+    env.scansDir,
+  ]
+  .asList()
+  .forEach(createDir)
 
-proc saveFinal(input: string, output: string): Either[string, string] =
-    if fileExists(output):
-        let backupDir = mkdtemp(dir = BACKUPDIR)
-        let backupFile = joinPath(backupDir, extractFilename(output))
-        moveFile(output, backupFile)
-
-        sh(&"qpdf --empty --pages {backupFile} {input} -- {output}")
-            .map((x: string) => output)
-    else:
-        moveFile(input, output)
-        output.right("")
-
-proc main*(input = "", output = ""): any =
-    let tmpDir = mkdtemp()
-
-    let output = output
-    .some
-    .notEmpty
-    .map((x: string) => x.absolutePath)
-    .getOrElse(() => scanOutputPath(workingDir = tmpDir))
-
-    if fileExists(output):
-      fileOverwritePrompt(output)
-
-    let ocrPdfPath = joinPath(tmpDir, "out.pdf")
-
-    # When no file name is passed execute scan & processing command
-    let filename = input
-    .some
-    .notEmpty
-    .fold(
-      () => sh(SCAN_CMD, tmpDir)
-      .flatMap((x: string) => sh(PROCESS_SCAN_CMD, tmpDir))
-      .map(x => "out.tif")
-      .map(x => joinPath(tmpDir, x)),
-      x => x
-      .rightS
-      .flatMap((path: string) => preparePassedFile(path, tmpDir))
+  if not env.orgFile.fileExists():
+    let initFile = org.initFile(
+      fileTitleHeader = "Scans".just(),
+      rootHeadline = "Scans".just(),
     )
-    # OCR the input file
-    .flatMap((x: string) =>
-             sh(&"ocrmypdf {x} {ocrPdfPath} --image-dpi 72")
-             .map((x: string) => ocrPdfPath)
-    )
+    env.orgFile.writeFile(initFile)
 
-    if filename.isRight:
-        echo filename
-        echo output
-        discard saveFinal(input = filename.getOrElse(""), output = output)
-        echo "Finish saving file"
-    ""
+  env
+
+proc main*(filePaths: seq[string]): auto =
+  let filePaths = filePaths
+  .map(expandTilde)
+  .filter(fileExists)
+
+  let env = mkDefaultEnv()
+  .setup()
+  .tryET()
+
+  filePaths
+  .asList()
+  .map(path => copyFile(path=path, env=env.get()))

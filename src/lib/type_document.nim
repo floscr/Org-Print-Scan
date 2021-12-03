@@ -7,6 +7,7 @@ import fusion/matching
 import fp/maybe
 import ./env
 import ./utils/fp
+import ./org
 
 {.experimental: "caseStmtMacros".}
 
@@ -47,7 +48,4 @@ proc toOrg*(x: Document, env: Env): string =
     title => &"[[file:./{relativeFileName}][{title}]]",
   )
 
-# let createdTime = getTime()-a[]
-
-#   &"""** {titleLink}
-# """
+  org.makeHeadline(title = titleLink, level = 2)

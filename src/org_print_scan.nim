@@ -1,19 +1,24 @@
 import argparse
+import fusion/matching
+import ./lib/env
+import ./lib/main
 
-var p = newParser:
-  option("-o", "--output", help="Output to this file")
-  command("copy"):
-    arg("name")
-    arg("others", nargs = -1)
-    run:
-      echo opts.name
-      echo opts.others
-      echo opts.parentOpts.apple
-      echo opts.parentOpts.b
-      echo opts.parentOpts.output
+{.experimental: "caseStmtMacros".}
 
-try:
-  p.run(@["--apple", "-o=foo", "somecommand", "myname", "thing1", "thing2"])
-except UsageError as e:
-  stderr.writeLine getCurrentExceptionMsg()
-  quit(1)
+proc runCli(): auto =
+  var p = newParser:
+    help(APP_NAME)
+    command("copy"):
+      arg("file")
+      run:
+        discard main(filePaths = @[opts.file])
+
+  try:
+    if commandLineParams().len == 0:
+      echo p.help
+      quit(0)
+
+    p.run(commandLineParams())
+  except UsageError as e:
+    stderr.writeLine getCurrentExceptionMsg()
+    quit(1)

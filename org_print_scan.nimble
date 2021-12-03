@@ -17,6 +17,7 @@ requires "print"
 requires "cligen >= 1.5.4"
 requires "tempfile >= 0.1.7"
 requires "fusion"
+requires "zero_functional"
 
 import distros
 if detectOs(NixOS):
