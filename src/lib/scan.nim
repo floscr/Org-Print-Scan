@@ -45,7 +45,9 @@ proc setup(env: Env): auto =
   .forEach(createDir)
 
   if not env.orgFile.fileExists():
-     env.orgFile.writeFile(content="")
+     env.orgFile.writeFile(content=&"""#+TITLE: Scans
+
+* Scans"""
 
   env
 
