@@ -30,7 +30,11 @@ proc makeHeadlineTags*(tags: seq[string] = @[]): string =
 
     &":{tagsStr}:"
 
-proc makeHeadline*(title: string, level = 1, tags: seq[string] = @[]): string =
+proc makeHeadline*(
+  title: string,
+  level = 1,
+  tags: seq[string] = @[],
+): string =
   let stars = "*".repeat(level).just()
   let title = title.just()
   let tags = tags
