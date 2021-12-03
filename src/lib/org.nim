@@ -6,10 +6,19 @@ import collections/sequtils
 import sugar
 import fp/list
 import zero_functional
+import times
 
 const ORG_FILE_HEADER_TITLE_KEY = "TITLE"
+const ORG_TIME_FORMAT = "YYYY-MM-dd ddd" # 2022-01-07 Fri
 
 type orgProperty = (string, string)
+
+proc makeTimestamp(date: DateTime, inactive = true): string =
+  let dateStr = date.format(ORG_TIME_FORMAT)
+  if inactive:
+    &"[{dateStr}]"
+  else:
+    &"<{dateStr}>"
 
 proc makeFileHeader*(key: string, value: string): string =
   ## Create an org file header with `key` and `value`.
@@ -95,6 +104,11 @@ proc initFile*(
 
 when isMainModule:
   import unittest
+
+  test "Date":
+    let dt = dateTime(2017, mMar, 30, 00, 00, 00, 00, utc())
+    check: dt.makeTimestamp() == "[2017-03-30 Thu]"
+    check: dt.makeTimestamp(inactive = false) == "<2017-03-30 Thu>"
 
   test "Properties Block":
     check: makeHeadlineProperties(@[("foo", "bar")]) == """:PROPERTIES:
