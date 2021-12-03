@@ -22,3 +22,6 @@ proc runCli(): auto =
   except UsageError as e:
     stderr.writeLine getCurrentExceptionMsg()
     quit(1)
+
+when isMainModule:
+  runCli()

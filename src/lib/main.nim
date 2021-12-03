@@ -18,8 +18,6 @@ import ./org
 {.experimental: "caseStmtMacros".}
 
 proc copyFile(path: string, env: Env): auto =
-  let (srcDir, srcBase, srcExt) = path.splitFile()
-
   let srcDocument = newDocument(path)
 
   let dstFilename = srcDocument.getDstFileName()

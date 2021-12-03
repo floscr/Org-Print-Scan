@@ -2,6 +2,7 @@ import std/os
 import std/sugar
 import std/os
 import std/osproc
+import std/times
 import fp/maybe
 
 const APP_NAME* = "papi"
@@ -14,12 +15,14 @@ type Env* = object
   baseDir*: string
   scansDir*: string
   orgFile*: string
+  executionDate*: DateTime
 
 proc mkDefaultEnv*(): Env =
   Env(
     baseDir: BASE_DIR,
     scansDir: SCANS_DIR,
     orgFile: ORG_FILE,
+    executionDate: now(),
   )
 
 proc strDefineToMaybe(x: string): Maybe[string] =

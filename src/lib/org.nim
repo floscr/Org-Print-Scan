@@ -13,7 +13,7 @@ const ORG_TIME_FORMAT = "YYYY-MM-dd ddd" # 2022-01-07 Fri
 
 type orgProperty = (string, string)
 
-proc makeTimestamp(date: DateTime, inactive = true): string =
+proc makeTimestamp*(date: DateTime, inactive = true): string =
   let dateStr = date.format(ORG_TIME_FORMAT)
   if inactive:
     &"[{dateStr}]"

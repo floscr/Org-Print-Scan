@@ -48,4 +48,10 @@ proc toOrg*(x: Document, env: Env): string =
     title => &"[[file:./{relativeFileName}][{title}]]",
   )
 
-  org.makeHeadline(title = titleLink, level = 2)
+  org.makeHeadline(
+    title = titleLink,
+    level = 2,
+    properties = @[
+      ("CREATED", org.makeTimestamp(env.executionDate))
+    ],
+  )

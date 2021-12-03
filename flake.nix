@@ -8,6 +8,7 @@
   outputs = { self, nixpkgs, nimble, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+        name = "org_print_scan";
         pkgs = nixpkgs.legacyPackages.${system};
         nimpkgs = nimble.packages.${system};
         buildInputs = with pkgs; [
@@ -58,6 +59,7 @@
                 --excessiveStackTrace:on \
                 -p:${fusion}/src \
                 -p:${nimfp}/src \
+                -p:${nimpkgs.argparse}/src \
                 -p:${nimpkgs.cascade}/src \
                 -p:${nimpkgs.classy}/src \
                 -p:${nimpkgs.cligen}/src \
@@ -68,7 +70,7 @@
                 -p:${nimpkgs.unpack}/src \
                 -p:${nimpkgs.zero_functional}/src \
                 --out:$TMPDIR/${name} \
-                ./src/lib/scan.nim
+                ./src/${name}.nim
           '';
           installPhase = ''
             install -Dt $out/bin $TMPDIR/org_print_scan
