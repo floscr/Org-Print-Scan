@@ -12,9 +12,11 @@ binDir        = "./dst"
 # Dependencies
 
 requires "nim >= 1.4.4"
-requires "nimfp >= 0.4.5"
+requires "https://github.com/floscr/nimfp#master"
+requires "print"
 requires "cligen >= 1.5.4"
 requires "tempfile >= 0.1.7"
+requires "fusion"
 
 import distros
 if detectOs(NixOS):
